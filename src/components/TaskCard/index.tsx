@@ -15,9 +15,10 @@ interface TaskItemProps {
     presentationOrder: number;
   };
   index: number;
+  onDeleteTask: () => void;
 }
 
-function TaskCard({ task, index }: TaskItemProps) {
+function TaskCard({ task, index, onDeleteTask }: TaskItemProps) {
   const navigate = useNavigate();
 
   async function HandleEditTask(id: string) {
@@ -62,7 +63,7 @@ function TaskCard({ task, index }: TaskItemProps) {
             <button onClick={() => HandleEditTask(task.id)} type="button">
               <FaEdit size={25} color="#000" />
             </button>
-            <DeleteButton taskId={task.id} />
+            <DeleteButton taskId={task.id} onDelete={onDeleteTask} />
           </CardActions>
         </CardContainer>
       )}

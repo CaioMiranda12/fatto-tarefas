@@ -1,9 +1,15 @@
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
-import { collection, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { db } from '../../services/firebaseConnection';
-import TaskCard from '../TaskItem';
+import TaskCard from '../TaskCard';
 import { Container, Content } from './styles';
 
 interface TaskProps {
@@ -70,6 +76,21 @@ function TaskList() {
     setTasks(items);
   }
 
+  async function handleDeleteAndReorder(taskId: string) {
+    const taskRef = doc(db, 'tarefas', taskId);
+    await deleteDoc(taskRef);
+
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+
+    const batchUpdates = updatedTasks.map((task, index) => {
+      const taskRef = doc(db, 'tarefas', task.id);
+      return updateDoc(taskRef, { presentationOrder: index + 1 });
+    });
+
+    await Promise.all(batchUpdates);
+  }
+
   return (
     <Container>
       <Content>
@@ -78,7 +99,12 @@ function TaskList() {
             {(provided) => (
               <ul ref={provided.innerRef} {...provided.droppableProps}>
                 {tasks.map((task, index) => (
-                  <TaskCard key={task.id} task={task} index={index} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    index={index}
+                    onDeleteTask={() => handleDeleteAndReorder(task.id)}
+                  />
                 ))}
 
                 {provided.placeholder}

@@ -8,9 +8,10 @@ import { Container, ConfirmContainer } from './styles';
 
 interface DeleteButtonProps {
   taskId: string;
+  onDelete: () => void;
 }
 
-function DeleteButton({ taskId }: DeleteButtonProps) {
+function DeleteButton({ taskId, onDelete }: DeleteButtonProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -34,7 +35,7 @@ function DeleteButton({ taskId }: DeleteButtonProps) {
         <ConfirmContainer>
           <p>Você tem certeza que deseja excluir a tarefa?</p>
           <div>
-            <button onClick={() => HandleDeleteTask(taskId)}>Sim</button>
+            <button onClick={onDelete}>Sim</button>
             <button onClick={handleClick}>Não</button>
           </div>
         </ConfirmContainer>
