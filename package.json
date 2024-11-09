@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": {
+    "name": "Caio César Lima Miranda",
+    "email": "caiomiranda.contato1@gmail.com",
+    "url": "https://github.com/CaioMiranda12"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
