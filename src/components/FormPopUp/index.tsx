@@ -89,7 +89,7 @@ function FormPopUp() {
         : 1;
 
     const inputDate = new Date(limitDate);
-    const newDate = inputDate.setDate(inputDate.getDate() + 1);
+    inputDate.setDate(inputDate.getDate() + 1);
 
     inputDate.setHours(0, 0, 0, 0);
 
