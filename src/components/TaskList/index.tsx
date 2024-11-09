@@ -1,20 +1,10 @@
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { collection, getDocs } from 'firebase/firestore';
-import { useEffect, useRef, useState } from 'react';
-import { FaEdit } from 'react-icons/fa';
-import { IoSearchSharp } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import { db } from '../../services/firebaseConnection';
-import { convertCurrency } from '../../utils/convertCurrency';
-import DeleteButton from '../DeleteButton';
-import {
-  CardActions,
-  Container,
-  Content,
-  InputContainer,
-  CardContainer,
-  CardId,
-} from './styles';
+import TaskCard from '../TaskItem';
+import { Container, Content } from './styles';
 
 interface TaskProps {
   id: string;
@@ -25,9 +15,6 @@ interface TaskProps {
 }
 
 function TaskList() {
-  const navigate = useNavigate();
-
-  const inputRef = useRef<HTMLInputElement>(null);
   const [tasks, setTasks] = useState<TaskProps[]>([]);
 
   const tarefasCollection = collection(db, 'tarefas');
@@ -63,67 +50,42 @@ function TaskList() {
     fetchTasks();
   }, [tarefasSnapshot]);
 
-  function handleSearchClick() {
-    if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
+  function reorder<T>(list: T[], startIndex: number, endIndex: number) {
+    const result = Array.from(list);
+
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  }
+
+  function onDragEnd(result: any) {
+    if (!result.destination) {
+      return;
     }
-  }
 
-  async function HandleEditTask(id: string) {
-    navigate(`/tarefa/${id}`);
-  }
+    const items = reorder(tasks, result.source.index, result.destination.index);
 
-  function formatDate(date: Date | string) {
-    const inputDate = new Date(date);
-    const newDate = inputDate.setDate(inputDate.getDate() + 1);
-
-    return new Date(date).toLocaleDateString();
+    console.log(items);
+    setTasks(items);
   }
 
   return (
     <Container>
       <Content>
-        <InputContainer>
-          <button onClick={handleSearchClick} type="button">
-            <IoSearchSharp color="#000" size={20} />
-          </button>
-          <input ref={inputRef} placeholder="Procurar tarefa..." />
-        </InputContainer>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="tasks" type="list" direction="vertical">
+            {(provided) => (
+              <ul ref={provided.innerRef} {...provided.droppableProps}>
+                {tasks.map((task, index) => (
+                  <TaskCard key={task.id} task={task} index={index} />
+                ))}
 
-        <ul>
-          {tasks.map((task) => (
-            <li key={task.id}>
-              <CardContainer>
-                <span>Nome: {task.name}</span>
-                {task.cost >= 1000 ? (
-                  <p
-                    style={{
-                      backgroundColor: '#ffd843',
-                      padding: 10,
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    Custo: {convertCurrency(task.cost)}
-                  </p>
-                ) : (
-                  <p>Custo: {convertCurrency(task.cost)}</p>
-                )}
-                <p>Data limite: {formatDate(task.limitDate)}</p>
-
-                <CardId>
-                  Id: <span>{task.id}</span>
-                </CardId>
-                <CardActions>
-                  <button onClick={() => HandleEditTask(task.id)} type="button">
-                    <FaEdit size={25} color="#000" />
-                  </button>
-                  <DeleteButton taskId={task.id} />
-                </CardActions>
-              </CardContainer>
-            </li>
-          ))}
-        </ul>
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Content>
     </Container>
   );
