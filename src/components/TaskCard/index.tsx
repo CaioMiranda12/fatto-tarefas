@@ -63,7 +63,7 @@ function TaskCard({ task, index, onDeleteTask }: TaskItemProps) {
             <button onClick={() => HandleEditTask(task.id)} type="button">
               <FaEdit size={25} color="#000" />
             </button>
-            <DeleteButton taskId={task.id} onDelete={onDeleteTask} />
+            <DeleteButton onDelete={onDeleteTask} />
           </CardActions>
         </CardContainer>
       )}
