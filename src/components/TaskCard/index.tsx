@@ -26,9 +26,6 @@ function TaskCard({ task, index, onDeleteTask }: TaskItemProps) {
   }
 
   function formatDate(date: Date | string) {
-    const inputDate = new Date(date);
-    const newDate = inputDate.setDate(inputDate.getDate() + 1);
-
     return new Date(date).toLocaleDateString();
   }
 
