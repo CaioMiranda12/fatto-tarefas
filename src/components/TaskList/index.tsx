@@ -65,15 +65,21 @@ function TaskList() {
     return result;
   }
 
-  function onDragEnd(result: any) {
+  async function onDragEnd(result: any) {
     if (!result.destination) {
       return;
     }
 
     const items = reorder(tasks, result.source.index, result.destination.index);
 
-    console.log(items);
     setTasks(items);
+
+    const batchUpdates = items.map((task, index) => {
+      const taskRef = doc(db, 'tarefas', task.id);
+      return updateDoc(taskRef, { presentationOrder: index + 1 });
+    });
+
+    await Promise.all(batchUpdates);
   }
 
   async function handleDeleteAndReorder(taskId: string) {
