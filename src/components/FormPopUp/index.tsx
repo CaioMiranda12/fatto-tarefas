@@ -2,10 +2,9 @@ import Popper from '@mui/material/Popper';
 import {
   addDoc,
   collection,
-  doc,
   getDocs,
   query,
-  updateDoc,
+  Timestamp,
   where,
 } from 'firebase/firestore';
 import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react';
@@ -17,7 +16,7 @@ interface TaskProps {
   id?: string;
   name: string;
   cost: number;
-  limitDate: Date;
+  limitDate: Date | Timestamp;
   presentationOrder: number;
 }
 
@@ -92,10 +91,14 @@ function FormPopUp() {
     const inputDate = new Date(limitDate);
     const newDate = inputDate.setDate(inputDate.getDate() + 1);
 
+    inputDate.setHours(0, 0, 0, 0);
+
+    const timestamp = Timestamp.fromDate(inputDate);
+
     const novaTarefa: TaskProps = {
       name: name,
       cost: cost,
-      limitDate: new Date(newDate),
+      limitDate: timestamp,
       presentationOrder: novaOrdemApresentacao,
     };
 

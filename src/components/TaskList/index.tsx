@@ -1,8 +1,7 @@
-import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import { IoSearchSharp } from 'react-icons/io5';
-import { MdDelete } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
 import { db } from '../../services/firebaseConnection';
@@ -79,22 +78,7 @@ function TaskList() {
     const inputDate = new Date(date);
     const newDate = inputDate.setDate(inputDate.getDate() + 1);
 
-    // return inputDate.toLocaleDateString();
-
-    // return new Date(newDate).toLocaleDateString();
-
     return new Date(date).toLocaleDateString();
-  }
-
-  function formatStartDate(date: Date | string) {
-    const inputDate = new Date(date);
-    const newDate = inputDate.setDate(inputDate.getDate() + 1);
-
-    return inputDate.toLocaleDateString();
-
-    // return new Date(newDate).toLocaleDateString();
-
-    // return new Date(date).toLocaleDateString();
   }
 
   return (

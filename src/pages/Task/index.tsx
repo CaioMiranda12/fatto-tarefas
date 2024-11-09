@@ -1,4 +1,4 @@
-import { doc, DocumentData, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -7,7 +7,7 @@ import { Container, HeaderLink, HeaderTask } from './styles';
 
 interface TaskProp {
   name: string;
-  limitDate: string;
+  limitDate: Timestamp | Date;
   cost: number;
   presentationOrder: string;
 }
@@ -35,14 +35,17 @@ function Task() {
         navigate('/');
       } else {
         const taskData = snapshot.data() as TaskProp;
-
         setTask(taskData);
 
         setName(taskData.name);
         setCost(taskData.cost);
 
-        if (taskData.limitDate) {
-          setLimitDate(taskData.limitDate);
+        if (taskData.limitDate instanceof Timestamp) {
+          const date = taskData.limitDate.toDate();
+          const formattedDate = date.toISOString().split('T')[0];
+          setLimitDate(formattedDate);
+        } else {
+          setLimitDate(taskData.limitDate.toString());
         }
       }
     }
@@ -64,17 +67,14 @@ function Task() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!task) return;
-
-    const inputDate = new Date(limitDate);
-    const newDate = inputDate.setDate(inputDate.getDate() + 1);
-    console.log(new Date(newDate).toLocaleDateString);
+    if (!task || !id) return;
 
     const updatedTask = {
       name,
-      limitDate: limitDate || newDate,
+      limitDate: Timestamp.fromDate(new Date(`${limitDate}T00:00:00`)),
       cost,
     };
+
     const docRef = doc(db, 'tarefas', `${id}`);
     try {
       await updateDoc(docRef, updatedTask);
